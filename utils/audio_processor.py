@@ -9,21 +9,35 @@ DOWNLOAD_DIR = 'downloades'
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 
+import os
+from dotenv import load_dotenv
+import yt_dlp
+from pydub import AudioSegment
+
+load_dotenv()
+
+DOWNLOAD_DIR = 'downloades'
+os.makedirs(DOWNLOAD_DIR, exist_ok=True)
+
+
 def download_youtube_audio(url: str) -> str:
-    """Downloads audio from YouTube and converts it to WAV format."""
+    """Downloads audio from YouTube, bypasses 403 blocks, and converts to WAV format."""
     output_path = os.path.join(DOWNLOAD_DIR, "%(title)s.%(ext)s")
     
     ydl_opts = {
         "format": "m4a/bestaudio/best",
         "outtmpl": output_path,
+        # Updated extractor arguments to bypass modern YouTube 403/PoToken restrictions
         "extractor_args": {
             "youtube": {
-                "player_client": ["android", "ios", "mweb"]
+                "player_client": ["android", "ios", "mweb"],
+                "player_skip": ["configs", "webpage"],
             }
         },
         "http_headers": {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-            "Accept-Language": "en-US,en;q=0.9",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.5",
         },
         "postprocessors": [
             {
@@ -46,7 +60,7 @@ def download_youtube_audio(url: str) -> str:
 
 
 def convert_to_wav(input_path: str) -> str:
-    """Converts local audio/video files to 16kHz mono WAV format."""
+    """Converts local audio/video files to standard 16kHz mono WAV format."""
     output_path = os.path.splitext(input_path)[0] + "_converted.wav"
     audio = AudioSegment.from_file(input_path)
     audio = audio.set_channels(1).set_frame_rate(16000)
@@ -55,8 +69,10 @@ def convert_to_wav(input_path: str) -> str:
 
 
 def chunk_audio(wav_path: str, chunk_minutes: int = 10) -> list:
-    """Splits audio into smaller segments to prevent memory overload."""
+    """Splits audio into smaller segments (16kHz mono) to prevent memory overload."""
     audio = AudioSegment.from_wav(wav_path)
+    # Ensure all chunks are standardized to 16kHz mono for speech recognition
+    audio = audio.set_channels(1).set_frame_rate(16000)
     chunk_ms = chunk_minutes * 60 * 1000 
 
     chunks = []
@@ -85,7 +101,6 @@ def process_input(source: str) -> list:
 
 
 if __name__ == "__main__":
-    # Test CLI execution locally
     test_source = input("Enter YouTube URL or file path: ").strip()
     if test_source:
         res = process_input(test_source)
