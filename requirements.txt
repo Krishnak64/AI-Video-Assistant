@@ -42,3 +42,11 @@ python-dotenv>=1.0.0              # Load API keys from .env
 numpy>=1.26.0
 tqdm>=4.66.0                      # Progress bars
 requests>=2.32.0
+
+# Vector Store & Embeddings
+chromadb>=0.5.0
+langchain-chroma>=0.1.0
+sentence-transformers>=3.0.0
+langchain-huggingface>=0.0.3
+huggingface-hub>=0.23.0
+tiktoken>=0.7.0
