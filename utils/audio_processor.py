@@ -10,19 +10,20 @@ os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 
 def download_youtube_audio(url: str) -> str:
-    """Downloads audio from YouTube and converts it to WAV format."""
+    """Downloads audio from YouTube with client fallback logic."""
     output_path = os.path.join(DOWNLOAD_DIR, "%(title)s.%(ext)s")
-    
+
     ydl_opts = {
         "format": "m4a/bestaudio/best",
         "outtmpl": output_path,
         "extractor_args": {
             "youtube": {
-                "player_client": ["android", "ios", "mweb"]
+                "player_client": ["tv_embedded", "android", "ios", "mweb"],
+                "player_skip": ["webpage", "configs"],
             }
         },
         "http_headers": {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
             "Accept-Language": "en-US,en;q=0.9",
         },
         "postprocessors": [
@@ -35,13 +36,13 @@ def download_youtube_audio(url: str) -> str:
         "quiet": True,
         "no_warnings": True,
     }
-    
+
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=True)
         filename = ydl.prepare_filename(info)
         base_name, _ = os.path.splitext(filename)
         wav_filename = f"{base_name}.wav"
-        
+
     return wav_filename
 
 
