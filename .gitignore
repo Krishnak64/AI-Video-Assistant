@@ -1,0 +1,19 @@
+# Environment
+.env
+venv/
+.venv/
+
+# Python
+__pycache__/
+*.pyc
+
+# Audio / downloaded files
+downloades/
+*.wav
+*.mp3
+
+# Vector database
+vector_db/
+
+# IDE
+.vscode/
