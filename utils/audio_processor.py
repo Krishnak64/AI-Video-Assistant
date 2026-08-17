@@ -1,4 +1,9 @@
 import os
+import static_ffmpeg
+
+# Call add_paths BEFORE importing pydub so pydub finds ffmpeg immediately
+static_ffmpeg.add_paths()
+
 import yt_dlp
 from pydub import AudioSegment
 
